@@ -6,3 +6,10 @@ export const toggleCartDropdown = (toggleState) => {
     payload: toggleState,
   };
 };
+
+export const addItemToCart = (item) => {
+  return {
+    type: CartActionTypes.ADD_ITEM,
+    payload: item,
+  };
+};
