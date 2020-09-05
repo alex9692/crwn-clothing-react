@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 
 import Header from "./components/header/header.component";
@@ -12,13 +12,6 @@ import { setCurrentUser } from "./redux/user/user-actions";
 import "./App.css";
 
 class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      currentUser: null,
-    };
-  }
-
   unsubscribeFromAuth = null;
 
   componentDidMount() {
@@ -49,7 +42,17 @@ class App extends React.Component {
         <Header />
         <Switch>
           <Route path="/shop" component={ShopPage} />
-          <Route path="/authenticate" component={SignInAndSignUpPage} />
+          <Route
+            exact
+            path="/authenticate"
+            render={() => {
+              return this.props.currentUser ? (
+                <Redirect to="/" />
+              ) : (
+                <SignInAndSignUpPage />
+              );
+            }}
+          />
           <Route path="/" component={HomePage} />
         </Switch>
       </div>
@@ -57,8 +60,12 @@ class App extends React.Component {
   }
 }
 
+const matchStateToProps = (state) => ({
+  currentUser: state.user.currentUser,
+});
+
 const matchDispatchToProps = (dispatch) => ({
   setCurrentUser: (user) => dispatch(setCurrentUser(user)),
 });
 
-export default connect(null, matchDispatchToProps)(App);
+export default connect(matchStateToProps, matchDispatchToProps)(App);
