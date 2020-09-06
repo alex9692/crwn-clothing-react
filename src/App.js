@@ -1,13 +1,19 @@
 import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
+import { createStructuredSelector } from "reselect";
 
 import Header from "./components/header/header.component";
+
 import HomePage from "./pages/homepage/homepage.component";
 import ShopPage from "./pages/shop/shop.component";
+import CheckoutPage from "./pages/checkout/checkout.component";
 import SignInAndSignUpPage from "./pages/signin-and-signup/signin-and-signup.component";
+
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
+
 import { setCurrentUser } from "./redux/user/user-actions";
+import { selectCurrentUser } from "./redux/user/user-selector";
 
 import "./App.css";
 
@@ -43,16 +49,16 @@ class App extends React.Component {
         <Switch>
           <Route path="/shop" component={ShopPage} />
           <Route
-            exact
             path="/authenticate"
             render={() => {
-              return this.props.currentUser ? (
-                <Redirect to="/" />
-              ) : (
-                <SignInAndSignUpPage />
-              );
+              if (!this.props.currentUser) {
+                return <SignInAndSignUpPage />;
+              } else {
+                return <Redirect to="/" />;
+              }
             }}
           />
+          <Route path="/checkout" component={CheckoutPage} />
           <Route path="/" component={HomePage} />
         </Switch>
       </div>
@@ -60,12 +66,12 @@ class App extends React.Component {
   }
 }
 
-const matchStateToProps = (state) => ({
-  currentUser: state.user.currentUser,
+const mapStateToProps = createStructuredSelector({
+  currentUser: selectCurrentUser,
 });
 
-const matchDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch) => ({
   setCurrentUser: (user) => dispatch(setCurrentUser(user)),
 });
 
-export default connect(matchStateToProps, matchDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);
