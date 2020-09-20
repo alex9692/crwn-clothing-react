@@ -3,9 +3,9 @@ import { createSelector } from "reselect";
 const selectShop = (state) => state.shop;
 const selectCollectionId = (state, props) => props.match.params.collectionId;
 
-export const selectCollectionsForPreview = createSelector(
+export const selectIsFetching = createSelector(
   [selectShop],
-  (shop) => Object.values(shop.collections)
+  (shop) => shop.isFetching
 );
 
 export const selectCollections = createSelector(
@@ -13,7 +13,18 @@ export const selectCollections = createSelector(
   (shop) => shop.collections
 );
 
+export const selectIsCollectionLoaded = createSelector(
+  [selectCollections],
+  (collections) => !!collections
+);
+
+export const selectCollectionsForPreview = createSelector(
+  [selectCollections],
+  (collections) => (collections ? Object.values(collections) : [])
+);
+
 export const selectCollection = createSelector(
   [selectCollections, selectCollectionId],
-  (collections, collectionUrlParam) => collections[collectionUrlParam]
+  (collections, collectionUrlParam) =>
+    collections ? collections[collectionUrlParam] : null
 );
